@@ -9,13 +9,15 @@ function App() {
 
   useEffect(() => {
     let storedSession = localStorage.getItem("sessionId");
+
     if (!storedSession) {
       storedSession = Date.now().toString();
       localStorage.setItem("sessionId", storedSession);
     }
+
     setSessionId(storedSession);
 
-    fetch(`http://localhost:5000/api/conversations/${storedSession}`)
+    fetch(`/api/conversations/${storedSession}`)
       .then(res => res.json())
       .then(data => setMessages(data))
       .catch(() => {});
@@ -32,20 +34,28 @@ function App() {
     setMessages(prev => [...prev, userMessage]);
     setLoading(true);
 
-    const response = await fetch("http://localhost:5000/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, message: input })
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, message: input })
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    const assistantMessage = {
-      role: "assistant",
-      content: data.reply
-    };
+      const assistantMessage = {
+        role: "assistant",
+        content: data.reply
+      };
 
-    setMessages(prev => [...prev, assistantMessage]);
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      setMessages(prev => [
+        ...prev,
+        { role: "assistant", content: "Something went wrong." }
+      ]);
+    }
+
     setInput("");
     setLoading(false);
   };
@@ -89,11 +99,15 @@ function App() {
               </div>
             </div>
           ))}
+
           {loading && (
             <div style={styles.messageWrapper}>
-              <div style={styles.loadingBubble}>Assistant is typing...</div>
+              <div style={styles.loadingBubble}>
+                Assistant is typing...
+              </div>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 

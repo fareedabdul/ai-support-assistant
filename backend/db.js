@@ -1,7 +1,6 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
-// Create database file
 const db = new sqlite3.Database(
   path.join(__dirname, "database.sqlite"),
   (err) => {
@@ -13,7 +12,6 @@ const db = new sqlite3.Database(
   }
 );
 
-// Create tables if not exist
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS sessions (
@@ -36,5 +34,6 @@ db.serialize(() => {
 
   console.log("Tables ready ✅");
 });
+
 
 module.exports = db;

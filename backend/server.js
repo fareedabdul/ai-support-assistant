@@ -16,9 +16,6 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 });
 
-/* ===============================
-   API ROUTES
-=================================*/
 
 app.post("/api/chat", async (req, res) => {
   const { sessionId, message } = req.body;
@@ -44,7 +41,6 @@ app.post("/api/chat", async (req, res) => {
     );
 
     let reply;
-
     if (foundDoc) {
       const completion = await groq.chat.completions.create({
         model: "llama-3.3-70b-versatile",
@@ -118,22 +114,15 @@ app.get("/api/sessions", (req, res) => {
   );
 });
 
-/* ===============================
-   SERVE FRONTEND (Express 5 SAFE)
-=================================*/
-
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-/* ===============================
-   START SERVER
-=================================*/
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
 });
